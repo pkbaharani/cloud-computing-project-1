@@ -1,5 +1,5 @@
-#!/usr/bin/python3
-
+ #!/usr/bin/python3
+import record_video
 '''
 SETUP:
 
@@ -45,7 +45,7 @@ while flag == 0:
         print("No intruders")
         time.sleep(1)
         end_time = datetime.now()
-        if (end_time-start_time).seconds <= duration:
+        if (end_time-start_time).seconds > duration:
             break
     elif i == 1:
         if flag == 0:
@@ -53,10 +53,8 @@ while flag == 0:
             on = time.time()
             flag = 1
             print("Recording video")
-            subprocess.call(['python','record_video.py'])
-            #print "Starting facedetect"
-            #subprocess.call(['sudo', 'chrt', '-i','98', './facedetect', 'frame.jpg'])
-            #print(*"Finished facedetect")
+            record_video.start(10)
+
             if inf:
                 flag = 0
             else:
