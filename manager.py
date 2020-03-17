@@ -1,10 +1,12 @@
 import boto3
 from botocore.exceptions import ClientError
-from time import time
-instanceIds={}
-
+import time
+instanceIds=[]
+instanceCount=0
 #Manager monitors queue and creates new instance if there is an element
 #We need to split this function i.e for Manager: do {monitor queue and create instace } and for EC2 do {get message from the queue}
+
+#this function is not required at this point
 def monitorQueue():
     sqs = boto3.resource('sqs')
     queue = sqs.get_queue_by_name(QueueName='video-key')
@@ -74,8 +76,8 @@ def get_instance_ids():
     for instance in ec2.instances.all():
         print (instance.id , instance.state)
         # write code, do not add the managers instance id
-        instanceIds[instance.id]=0
-
+        #instanceIds[instance.id]=0
+        instanceIds.append(instance.id)
 def start_next_available_instance():
 
     for instanceid in instanceIds:
@@ -124,6 +126,9 @@ def create_instance():
 
 if __name__=='__main__':
     get_instance_ids()
+    instanceCount=len(instanceIds)
+    print(instanceCount)
+    time.sleep(60)
     while True:
         auto_scale()
         time.sleep(30)

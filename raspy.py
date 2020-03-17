@@ -1,6 +1,6 @@
 import boto3
 import time
-
+from Library import utils
 file1=open("test_file",'w+')
 file1.write("hello")
 
@@ -9,7 +9,8 @@ file1.write("hello")
 def uploadVideoFile(filename):
     key=filename
     s3_res=boto3.resource('s3')
-    s3_res.meta.client.upload_file(Filename="Saved_Videos/{}".format(filename), Bucket='cse-546-video-files',Key=key)
+    #s3_res.meta.client.upload_file(Filename="Saved_Videos/{}".format(filename), Bucket='cse-546-video-files',Key=key)
+    s3_res.meta.client.upload_file(Filename="./Library/utils/"+filename, Bucket='cse-546-video-files',Key=key)
     print(key)
     pushSQS(key)
 
@@ -27,6 +28,6 @@ def pushSQS(video_key):
 if __name__=='__main__':
     i=0
     while i in range(7):
-        uploadVideoFile()
+        uploadVideoFile("newtestfile")
         i=i+1
         time.sleep(1)
