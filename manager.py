@@ -43,9 +43,10 @@ def auto_scale():
     sqs = boto3.resource('sqs')
     queue = sqs.get_queue_by_name(QueueName='video-key')
     print("getting messages")
-    que=queue.receive_messages(MessageAttributeNames=['Video-Key'])
-    que_length=len(que)
 
+    que=queue.receive_messages(MessageAttributeNames=['Video-Key'])
+    que_length=int(queue.attributes.get('ApproximateNumberOfMessages'))
+    print('queue length is ',que_length)
     #shut all the instances if there is nothing in the queue
     if que_length==0:
         for instance in instanceIds:
@@ -73,10 +74,13 @@ def auto_scale():
         for i in range(instanceCount):
             if(diff==0):
                 break
-
+            
+            print(instanceIds)
+            print('\n\n\n\n value of i-----------> ', i,'   and instnace id is ',instanceIds[i],'\n\n\n\n')
             temp=get_instance_state(instanceIds[i])
+            print('value of temp is ',temp)
             if temp == 0:
-                intance=instanceIds[i]
+                instance=instanceIds[i]
                 start_instnace(instance)    # starting instance
                 update_instance_state(instance,1) # updating the state in s3
                 diff=diff-1
@@ -112,7 +116,7 @@ def get_instance_state(instanceid):
     return int(body)
 
 def start_instnace(instanceid):
-
+    print('starting new instance -',instanceid)
     try:
         ec2 = boto3.client('ec2')
         response = ec2.start_instances(InstanceIds=[instanceid], DryRun=False)
