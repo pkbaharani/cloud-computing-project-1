@@ -1,8 +1,19 @@
 import boto3
 from botocore.exceptions import ClientError
+from ec2_metadata import ec2_metadata
 import time
+
+
 instanceIds=[]
 instanceCount=0
+myInstanceId='ic1'
+
+
+
+def get_my_instance_id():
+    return ec2_metadata.instance_id
+    #print(myInstanceId)
+
 #Manager monitors queue and creates new instance if there is an element
 #We need to split this function i.e for Manager: do {monitor queue and create instace } and for EC2 do {get message from the queue}
 
@@ -49,7 +60,7 @@ def auto_scale():
         temp=get_instance_state(instance)
         upcount=upcount+temp
 
-    if upcount == 15: # 15 is the total number of instances available out of 20 resources
+    if upcount == instanceCount: # 15 is the total number of instances available out of 20 resources
         #downscale
         if que_length<upcount:
             for i in range(que_length,upcount+1):
@@ -57,13 +68,13 @@ def auto_scale():
                 update_instance_state(instance,0)
                 return
     #upscale
-    if upcount<15 and upcount<que_length:
-        diff=min(que_length-upcount,15-upcount) # this is to reach maximum capacity or to empty the queue
-        for i in range (15):
+    if upcount<instanceCount and upcount<que_length:
+        diff=min(que_length-upcount,instanceCount-upcount) # this is to reach maximum capacity or to empty the queue
+        for i in range(instanceCount):
             if(diff==0):
                 break
 
-            temp=get_instance_state(i)
+            temp=get_instance_state(instanceIds[i])
             if temp == 0:
                 intance=instanceIds[i]
                 start_instnace(instance)    # starting instance
@@ -77,7 +88,11 @@ def get_instance_ids():
         print (instance.id , instance.state)
         # write code, do not add the managers instance id
         #instanceIds[instance.id]=0
-        instanceIds.append(instance.id)
+        myinstanceid=get_my_instance_id()
+        if myinstanceid!=instance.id:
+            instanceIds.append(instance.id)
+
+
 def start_next_available_instance():
 
     for instanceid in instanceIds:
@@ -125,10 +140,14 @@ def create_instance():
 #get_instance_state("blablabla")
 
 if __name__=='__main__':
+    #get_my_instance_id()
     get_instance_ids()
     instanceCount=len(instanceIds)
     print(instanceCount)
-    time.sleep(60)
+    print(instanceIds)
+    for instance in instanceIds:
+        update_instance_state(instance,0)
+#    time.sleep(60)
     while True:
         auto_scale()
         time.sleep(30)
