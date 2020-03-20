@@ -13,7 +13,7 @@ def start_instnace(instanceid):
 
 
 def process_ec2_machines():
-  sqs = boto3.client('sqs')
+  sqs = boto3.resource('sqs')
   queue = sqs.get_queue_by_name(QueueName='video-key')
 
   que=queue.receive_messages(MessageAttributeNames=['Video-Key'])
