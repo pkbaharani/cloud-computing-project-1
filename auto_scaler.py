@@ -26,10 +26,10 @@ def process_ec2_machines():
     stopped_instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['stopped']}])
     
     for inst in running_instances:
-      print("Running: ", inst.id, instance.instance_type)
+      print("Running: ", inst.id, inst.instance_type)
     
     for inst in stopped_instances:
-      print("Stopped: ", inst.id, instance.instance_type)
+      print("Stopped: ", inst.id, inst.instance_type)
 
 process_ec2_machines()
 
