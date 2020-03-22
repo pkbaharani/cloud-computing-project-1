@@ -7,7 +7,7 @@ file1.write("hello")
 #client function
 #upload video to the s3, and push key on the sqs
 def uploadVideoFile(filename):
-    key=filename
+    key=filename+str(time.time())
     s3_res=boto3.resource('s3')
     #s3_res.meta.client.upload_file(Filename="Saved_Videos/{}".format(filename), Bucket='cse-546-video-files',Key=key)
     s3_res.meta.client.upload_file(Filename="./Library/utils/"+filename, Bucket='cse-546-video-files',Key=key)

@@ -8,6 +8,21 @@ file1.close()"""
 S3_BUCKET="cse-546-video-files"
 INPUT_S3_FOLDER = "Input_Videos/{}"
 OUTPUT_S3 = "Detected_Outputs/{}"
+INSTANCE_STATE="Instance_State/{}"
+
+
+#download video file from the s3
+def getVideoFile(object_name):
+    s3 = boto3.client('s3')
+    print(object_name)
+    s3.download_file('cse-546-video-files',object_name, object_name)
+
+
+def push_result_s3(filename):
+    key=filename
+    s3_res=boto3.resource('s3')
+    #s3_res.meta.client.upload_file(Filename=<path_to_saved_result>.format(filename), Bucket='cse-546-video-darknet-results',Key=key)
+    s3_res.meta.client.upload_file(Filename="./Library/utils/"+filename, Bucket='cse-546-video-darknet-results',Key=key)
 
 
 def upload_file(file_path, bucket_name, key):
