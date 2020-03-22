@@ -67,9 +67,13 @@ while flag == 0:
             else:
                 pi_utils.set_busy()
                 pool = Pool(processes=1)
-                #result = pool.apply_async(detect_objects.start, [record_time])
-                detect_objects.start(record_time)
+                result = pool.apply_async(detect_objects.start, [file_path])
+                #detect_objects.start(file_path)
                 
+                #detect_objects.start(file_path)
+                #result.get()
+                #pool.close()
+                #pool.join()
             if inf:
                 flag = 0
             else:
@@ -77,4 +81,7 @@ while flag == 0:
                 if (end_time-start_time).seconds <= duration:
                     flag = 0
         time.sleep(0.1)
+
+while pi_utils.is_busy():
+    continue
         

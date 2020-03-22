@@ -5,7 +5,7 @@ import Library.sqs  as SQS
 file1.write("hello")
 file1.close()"""
 
-INPUT_BUCKET="cse-546-video-files"
+S3_BUCKET="cse-546-video-files"
 INPUT_S3_FOLDER = "Input_Videos/{}"
 OUTPUT_S3 = "Detected_Outputs/{}"
 
@@ -20,7 +20,7 @@ def upload_file(file_path, bucket_name, key):
 def uploadVideoFile(file_path):
     filename = file_path.split("/")[-1]
     s3_key = INPUT_S3_FOLDER.format(filename)
-    upload_file(file_path, INPUT_BUCKET, s3_key)
+    upload_file(file_path, S3_BUCKET, s3_key)
     print("Uploaded {} to S3 bucket".format(filename))
     SQS.pushSQS(s3_key)
     print("Pushed key to S3 bucket")
@@ -29,7 +29,7 @@ def uploadVideoFile(file_path):
 
 def upload_output_file(file_path):
     filename = file_path.split("/")[-1]
-    upload_file(file_path, OUTPUT_BUCKET, INPUT_S3_FOLDER.format(filename))
+    upload_file(file_path, S3_BUCKET, INPUT_S3_FOLDER.format(filename))
     print("Uploaded output file {}".format(filename))
     return
     
