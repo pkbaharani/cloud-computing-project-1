@@ -42,27 +42,6 @@ def getVideoFile(object_name):
     s3.download_file('cse-546-video-files',object_name, object_name)
 
 
-#polling key from the sqs
-def get_video_key():
-    sqs = boto3.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName='video-key')
-    print("getting messages")
-    que=queue.receive_messages(MessageAttributeNames=['Video-Key'])
-    if len(que)>0:
-        #start_instnace()
-
-        video_key = ''
-        print('in for loop')
-
-        message=que[0]
-        if message.message_attributes is not None:
-             video_key = message.message_attributes.get('Video-Key').get('StringValue')
-
-        print('video key is ',video_key,'end')
-        message.delete()
-        return video_key
-    else:
-        update_instance_state(instanceid,0) #instance is going to shut down
 
 
 def start_darknet(videokey):
