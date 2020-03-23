@@ -1,12 +1,15 @@
-INPUT_VIDEOS = "./Saved_Videos/{}"
+INPUT_VIDEOS = "./Input_Videos/{}"
 OUTPUT_FOLDER = "./Detected_Outputs/{}.txt"
 import Library.s3 as S3
 import os
-import pi_utils
 import sys
 import subprocess
 
 def start(input_file_path, is_pi=False):
+	if is_pi:
+		import pi_utils
+	#import pdb;pdb.set_trace()
+	print(input_file_path)
 	file_name = input_file_path.split("/")[-1]
 	with open("./input.txt", "w+") as ip_file:
 		ip_file.write(input_file_path)
