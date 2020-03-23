@@ -1,163 +1,109 @@
 import boto3
 from botocore.exceptions import ClientError
 from ec2_metadata import ec2_metadata
+import Library.sqs as SQS
+import Library.ec2Interface as EC2i
 import time
-
 
 instanceIds=[]
 instanceCount=0
-myInstanceId='ic1'
-
-
-
-def get_my_instance_id():
-    return ec2_metadata.instance_id
-    #print(myInstanceId)
-
-#Manager monitors queue and creates new instance if there is an element
-#We need to split this function i.e for Manager: do {monitor queue and create instace } and for EC2 do {get message from the queue}
-
-#this function is not required at this point
-def monitorQueue():
-    sqs = boto3.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName='video-key')
-    print("getting messages")
-    que=queue.receive_messages(MessageAttributeNames=['Video-Key'])
-    if len(que)>0:
-        start_instnace()
-
-        video_key = ''
-        print('in for loop')
-
-        message=que[0]
-        if message.message_attributes is not None:
-             video_key = message.message_attributes.get('Video-Key').get('StringValue')
-
-        print('video key is ',video_key,'end')
-        message.delete()
-        return video_key
-
-
+myInstanceId=''
 
 def auto_scale():
-    sqs = boto3.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName='video-key')
-    print("getting messages")
-
-    que=queue.receive_messages(MessageAttributeNames=['Video-Key'])
-    que_length=int(queue.attributes.get('ApproximateNumberOfMessages'))
+    que_length=SQS.get_queue_length()
     print('queue length is ',que_length)
-    #shut all the instances if there is nothing in the queue
+
+    #CASE-1 -> shut all the instances if there is nothing in the queue
     if que_length==0:
-        for instance in instanceIds:
-            update_instance_state(instance,0)
+        shut_all_instances()
         return
 
-    #check if number of running instance > the size of the queue, downscale is required
-    #if que_length in range (15):
+    upcount=get_total_ec2_upcount()     #get count of the number of instances that are up
 
+    #Case-2 -> upscale
+    if upcount<instanceCount and upcount<que_length:
+        upscale(que_length,upcount)
+
+    #Case-3 -> check if downscale is required
+    if upcount == instanceCount: # 15 is the total number of instances available out of 20 resources
+        if que_length<upcount:
+            # CASE-2-> downscale
+            downscale(que_length,upcount)
+
+
+def shut_all_instances():
+    for instance in instanceIds:
+            EC2i.update_instance_state(instance,0)
+
+
+def upscale(que_length,upcount):
+    diff=min(que_length-upcount,instanceCount-upcount) # this is to reach maximum capacity or to empty the queue
+    for i in range(instanceCount):
+        if(diff==0):
+            break
+        print(instanceIds)
+        print('\n\n\n\n value of i-----------> ', i,'   and instnace id is ',instanceIds[i],'\n\n\n\n')
+        temp=EC2i.get_instance_state(instanceIds[i])
+        print('value of temp is ',temp)
+        if temp == 0:
+            instance=instanceIds[i]
+            EC2i.start_instnace(instance)                   # starting instance
+            EC2i.update_instance_state(instance,1)          # updating the state in s3
+            diff=diff-1
+
+
+def downscale(que_length,upcount):
+    for i in range(que_length,upcount+1):
+        instance=instanceIds[i]
+        EC2i.update_instance_state(instance,0)
+        return
+
+
+def get_total_ec2_upcount():
     upcount=0;
     for instance in instanceIds:
-        temp=get_instance_state(instance)
+        temp=EC2i.get_instance_state(instance)
         upcount=upcount+temp
-
-    if upcount == instanceCount: # 15 is the total number of instances available out of 20 resources
-        #downscale
-        if que_length<upcount:
-            for i in range(que_length,upcount+1):
-                instance=instanceIds[i]
-                update_instance_state(instance,0)
-                return
-    #upscale
-    if upcount<instanceCount and upcount<que_length:
-        diff=min(que_length-upcount,instanceCount-upcount) # this is to reach maximum capacity or to empty the queue
-        for i in range(instanceCount):
-            if(diff==0):
-                break
-            
-            print(instanceIds)
-            print('\n\n\n\n value of i-----------> ', i,'   and instnace id is ',instanceIds[i],'\n\n\n\n')
-            temp=get_instance_state(instanceIds[i])
-            print('value of temp is ',temp)
-            if temp == 0:
-                instance=instanceIds[i]
-                start_instnace(instance)    # starting instance
-                update_instance_state(instance,1) # updating the state in s3
-                diff=diff-1
+    return upcount
 
 
 def get_instance_ids():
     ec2 = boto3.resource('ec2')
     for instance in ec2.instances.all():
         print (instance.id , instance.state)
-        # write code, do not add the managers instance id
-        #instanceIds[instance.id]=0
-        myinstanceid=get_my_instance_id()
+        myinstanceid=EC2i.get_my_instance_id()
         if myinstanceid!=instance.id:
             instanceIds.append(instance.id)
 
 
-def start_next_available_instance():
-
-    for instanceid in instanceIds:
-        if instanceIds[instanceid]==0:
-            start_instnace(instanceid)
-
-def update_instance_state(instanceid,value):
-
-    s3_res=boto3.client('s3')
-    s3_res.put_object(Body=str(value), Bucket='instance-state',Key=instanceid)
-
-
-def get_instance_state(instanceid):
-    s3 = boto3.resource('s3')
-    obj = s3.Object('instance-state',instanceid)
-    body = obj.get()['Body'].read()
-    return int(body)
-
-def start_instnace(instanceid):
-    print('starting new instance -',instanceid)
-    try:
-        ec2 = boto3.client('ec2')
-        response = ec2.start_instances(InstanceIds=[instanceid], DryRun=False)
-        print(response)
-        update_instance_state(instanceid,1) # setting value for this instance as one in s3 bucket.
-    except ClientError as e:
-        print(e)
-
-
-
-
-#NOT REQUIRED
-#create new ec2-instance on request
-def create_instance():
-    print("creating instance")
-    ec2 = boto3.resource('ec2')
-    instance = ec2.create_instances(
-    ImageId = 'ami-009d6802948d06e52',
-    MinCount = 1,
-    MaxCount = 1,
-    InstanceType = 't2.micro',
-    KeyName = 'cc-ec2-manager')
-    instanceIds[(instance[0].id)]=1
-
-#get_instance_state("blablabla")
-
 if __name__=='__main__':
-    #get_my_instance_id()
+
+    #start-up sequence
     get_instance_ids()
     instanceCount=len(instanceIds)
     print(instanceCount)
     print(instanceIds)
+
+    #initialize the state of all the ec2 instances to off in s3
     for instance in instanceIds:
-        update_instance_state(instance,0)
+        EC2i.update_instance_state(instance,0)
 #    time.sleep(60)
     while True:
         auto_scale()
         time.sleep(30)
 
 
+
 '''
+#******NOT REQUIRED at this time *************
+def start_next_available_instance():
+
+    for instanceid in instanceIds:
+        if instanceIds[instanceid]==0:
+            EC2i.start_instnace(instanceid)
+
+
+
 if __name__=='__main__':
     i=0
     while True:
@@ -170,6 +116,4 @@ if __name__=='__main__':
         print(instanceIds)
         print(i)
         i=i+1
-
-
 '''
