@@ -17,12 +17,13 @@ def get_my_instance_id():
 def update_instance_state(instanceid,value):
     key=INSTANCE_STATE.format(instanceid)
     s3_res=boto3.client('s3')
-    s3_res.put_object(Body=str(value), Bucket='instance-state',Key=key)
+    s3_res.put_object(Body=str(value), Bucket='cse-546-video-files',Key=key)
 
 
 def get_instance_state(instanceid):
     s3 = boto3.resource('s3')
-    obj = s3.Object('instance-state',instanceid)
+    key=INSTANCE_STATE.format(instanceid)
+    obj = s3.Object('cse-546-video-files',key)
     body = obj.get()['Body'].read()
     return int(body)
 
