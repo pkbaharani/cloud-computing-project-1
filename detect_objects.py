@@ -4,6 +4,7 @@ import Library.s3 as S3
 import os
 import sys
 import subprocess
+import time
 
 def start(input_file_path, is_pi=False):
 	if is_pi:
@@ -35,6 +36,7 @@ def start(input_file_path, is_pi=False):
 	S3.upload_output_file(output_file_path)
 	if is_pi:
 		pi_utils.set_free()
+	time.sleep(2)
 	return output_file_path
 	
 	

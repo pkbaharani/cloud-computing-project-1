@@ -13,7 +13,6 @@ INSTANCE_STATE="Instance_State/{}"
 
 #download video file from the s3
 def getVideoFile(object_name):
-    s3 = boto3.client('s3')
     print(object_name)
     s3.download_file('cse-546-video-files',object_name, object_name)
 
