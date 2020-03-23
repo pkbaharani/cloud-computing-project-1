@@ -17,6 +17,9 @@ import subprocess
 import time
 import sys
 from datetime import datetime
+import tracemalloc
+import gc
+import threading
 
 sensor = 12
 duration = sys.argv[1]
@@ -40,6 +43,7 @@ flag = 0
 
 pi_utils.set_free()
 
+tracemalloc.start()
 while flag == 0:
     i=GPIO.input(sensor)
     if i == 0:
@@ -61,15 +65,24 @@ while flag == 0:
             flag = 1
             print("Recording video")
             file_path = pi_utils.record_video(record_time)
-
+            time.sleep(0.1)  
+            gc.collect()
             if pi_utils.is_busy():
-                pool = Pool(processes=1)
-                result = pool.apply_async(S3.uploadVideoFile, [file_path])
-                S3.uploadVideoFile(file_path)
+                #pool = Pool(processes=2)
+                #result2 = pool.apply_async(S3.uploadVideoFile, [file_path])
+                #S3.uploadVideoFile(file_path)
+                video_thread = threading.Thread(target=S3.uploadVideoFile, args=(file_path,))
+                video_thread.start()
+                snapshot1 = tracemalloc.take_snapshot()
+                top_stats = snapshot1.compare_to(snapshot1, 'lineno')
+                for stat in top_stats[:20]:
+                    print(stat)
             else:
                 pi_utils.set_busy()
-                pool = Pool(processes=1)
-                result = pool.apply_async(detect_objects.start, [file_path, True])
+                darknet_thread = threading.Thread(target=detect_objects.start, args=(file_path,True,))
+                darknet_thread.start()
+                #pool = Pool(processes=2)
+                #result = pool.apply_async(detect_objects.start, [file_path, True])
                 #detect_objects.start(file_path)
                 
                 #detect_objects.start(file_path)
