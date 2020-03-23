@@ -19,8 +19,6 @@ if __name__=='__main__':
         if videokey is None:            # if the queue is empty, simply update the state in s3 and stop this instance
             break
         print(videokey)
-        #create_instance()
-        #getVideoFile function call has to be put in Ec2
         S3.getVideoFile(videokey)
         do.start(videokey)
         #import pdb;pdb.set_trace()
@@ -28,6 +26,8 @@ if __name__=='__main__':
         #S3.push_result_s3("newtestfile") # for this file name which is the output file specify the format
         print('darknet done here........')
         #S3.upload_output_file(videokey)
+        #EC2i.start_darknet(videokey)
+        #S3.upload_output_file()
         flag=EC2i.get_instance_state(instanceid)
     if typ!='test':
         EC2i.update_instance_state(instanceid,0)
