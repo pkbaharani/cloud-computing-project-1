@@ -22,7 +22,7 @@ def push_result_s3(filename):
     key=filename
     s3_res=boto3.resource('s3')
     #s3_res.meta.client.upload_file(Filename=<path_to_saved_result>.format(filename), Bucket='cse-546-video-darknet-results',Key=key)
-    s3_res.meta.client.upload_file(Filename="./Library/utils/"+filename, Bucket='cse-546-video-darknet-results',Key=key)
+    s3_res.meta.client.upload_file(Filename="./Library/utils/"+filename, Bucket='cse-546-video-files',Key=key)
 
 
 def upload_file(file_path, bucket_name, key):

@@ -20,6 +20,7 @@ def update_instance_state(instanceid,value):
     s3_res.put_object(Body=str(value), Bucket='cse-546-video-files',Key=key)
 
 
+
 def get_instance_state(instanceid):
     s3 = boto3.resource('s3')
     key=INSTANCE_STATE.format(instanceid)

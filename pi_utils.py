@@ -3,7 +3,7 @@ from time import sleep
 import time
 
 STATUS_FILE="./pi_status.txt"
-INPUT_FILE = "./Saved_Videos/{}.h264"
+INPUT_FILE = "./Input_Videos/{}.h264"
 
 def record_video(duration):
 	 

@@ -42,7 +42,7 @@ def upscale(que_length,upcount):
         if(diff==0):
             break
         print(instanceIds)
-        print('\n\n\n\n value of i-----------> ', i,'   and instnace id is ',instanceIds[i],'\n\n\n\n')
+        print('\n upscaling, adding ', diff,' instances and instnace id is ',instanceIds[i],'\n\n\n\n')
         temp=EC2i.get_instance_state(instanceIds[i])
         print('value of temp is ',temp)
         if temp == 0:
@@ -72,7 +72,7 @@ def get_instance_ids():
     for instance in ec2.instances.all():
         print (instance.id , instance.state)
         myinstanceid=EC2i.get_my_instance_id()
-        if myinstanceid!=instance.id:
+        if myinstanceid!=instance.id and instance.state !='terminated':
             instanceIds.append(instance.id)
 
 
