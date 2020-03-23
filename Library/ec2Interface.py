@@ -15,9 +15,9 @@ def get_my_instance_id():
 
 
 def update_instance_state(instanceid,value):
-
+    key=INSTANCE_STATE.format(instanceid)
     s3_res=boto3.client('s3')
-    s3_res.put_object(Body=str(value), Bucket='instance-state',Key=instanceid)
+    s3_res.put_object(Body=str(value), Bucket='instance-state',Key=key)
 
 
 def get_instance_state(instanceid):
