@@ -63,11 +63,13 @@ while flag == 0:
             file_path = pi_utils.record_video(record_time)
 
             if pi_utils.is_busy():
+                pool = Pool(processes=1)
+                result = pool.apply_async(S3.uploadVideoFile, [file_path])
                 S3.uploadVideoFile(file_path)
             else:
                 pi_utils.set_busy()
                 pool = Pool(processes=1)
-                result = pool.apply_async(detect_objects.start, [file_path])
+                result = pool.apply_async(detect_objects.start, [file_path, True])
                 #detect_objects.start(file_path)
                 
                 #detect_objects.start(file_path)

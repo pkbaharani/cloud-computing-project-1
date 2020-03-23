@@ -29,7 +29,7 @@ def uploadVideoFile(file_path):
 
 def upload_output_file(file_path):
     filename = file_path.split("/")[-1]
-    upload_file(file_path, S3_BUCKET, INPUT_S3_FOLDER.format(filename))
+    upload_file(file_path, S3_BUCKET, OUTPUT_S3.format(filename))
     print("Uploaded output file {}".format(filename))
     return
     

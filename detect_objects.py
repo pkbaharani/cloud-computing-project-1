@@ -6,7 +6,7 @@ import pi_utils
 import sys
 import subprocess
 
-def start(input_file_path):
+def start(input_file_path, is_pi=False):
 	file_name = input_file_path.split("/")[-1]
 	with open("./input.txt", "w+") as ip_file:
 		ip_file.write(input_file_path)
@@ -16,12 +16,7 @@ def start(input_file_path):
 	output=run_cmd.stdout
 	err=run_cmd.stderr
 	#output = command.read()
-	if err is None:
-		err = ""
-	with open("./error.txt", "w+") as err_file:
-		err_file.write(err)
-	with open("./output.txt", "w+") as err2_file:
-		err2_file.write(output)
+
 
 	clean_output = output.replace("\x1b[2J\x1b[1;1H", "")
 	clean_output = clean_output.replace("\n\n", "\n")
@@ -35,7 +30,8 @@ def start(input_file_path):
 				op_file.write("({}, {})\n".format(record_time, obj))
 				
 	S3.upload_output_file(output_file_path)
-	pi_utils.set_free()
+	if is_pi:
+		pi_utils.set_free()
 	return output_file_path
 	
 	

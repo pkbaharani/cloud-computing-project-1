@@ -25,8 +25,8 @@ def record_video(duration):
 	
 def is_busy():
 	with open("./pi_status.txt", "r") as file_ptr:
-		status = int(file_ptr.readline())
-	if status == 0:
+		status = file_ptr.readline()
+	if status == "0":
 		return False
 	return True
 	
