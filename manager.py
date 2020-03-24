@@ -29,7 +29,7 @@ def auto_scale():
         if que_length<upcount:
             # CASE-2-> downscale
             #downscale(que_length,upcount)
-
+            pass
 
 def shut_all_instances():
     for instance in instanceIds:
@@ -70,11 +70,12 @@ def get_total_ec2_upcount():
 def get_instance_ids():
     ec2 = boto3.resource('ec2')
     for instance in ec2.instances.all():
-        print (instance.id , instance.state)
+        print (instance.id)
+        #print(str(instance.state))
         myinstanceid=EC2i.get_my_instance_id()
-        if myinstanceid!=instance.id and instance.state !='terminated':
+        if myinstanceid!=instance.id and instance.state['Name']!='terminated':
             instanceIds.append(instance.id)
-
+            print(instance.state)
 
 if __name__=='__main__':
 
@@ -97,13 +98,9 @@ if __name__=='__main__':
 '''
 #******NOT REQUIRED at this time *************
 def start_next_available_instance():
-
     for instanceid in instanceIds:
         if instanceIds[instanceid]==0:
             EC2i.start_instnace(instanceid)
-
-
-
 if __name__=='__main__':
     i=0
     while True:
