@@ -28,7 +28,7 @@ def auto_scale():
     if upcount == instanceCount: # 15 is the total number of instances available out of 20 resources
         if que_length<upcount:
             # CASE-2-> downscale
-            downscale(que_length,upcount)
+            #downscale(que_length,upcount)
 
 
 def shut_all_instances():

@@ -28,7 +28,9 @@ if __name__=='__main__':
         #S3.upload_output_file(videokey)
         #EC2i.start_darknet(videokey)
         #S3.upload_output_file()
-        flag=EC2i.get_instance_state(instanceid)
+        flag=SQS.get_video_key()
+
+        #flag=EC2i.get_instance_state(instanceid)
     if typ!='test':
         EC2i.update_instance_state(instanceid,0)
         EC2i.stop_instance(instanceid)
