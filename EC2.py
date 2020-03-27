@@ -36,8 +36,8 @@ if __name__=='__main__':
         #S3.upload_output_file(videokey)
         #EC2i.start_darknet(videokey)
         #S3.upload_output_file()
-        flag=SQS.get_video_key()
-
+        #flag=SQS.get_video_key()
+        flag=SQS.get_queue_length()
 
         #flag=EC2i.get_instance_state(instanceid)
     if typ!='test':

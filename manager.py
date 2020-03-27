@@ -64,6 +64,7 @@ def get_total_ec2_upcount():
     for instance in instanceIds:
         temp=EC2i.get_instance_state(instance)
         upcount=upcount+temp
+    print("total number of instances up ",upcount)
     return upcount
 
 
