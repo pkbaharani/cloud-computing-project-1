@@ -14,23 +14,23 @@ if __name__=='__main__':
     typ=sys.argv[1]
     logger=logging.logging()
     instanceid=EC2i.get_my_instance_id()
-    logger.log_it("instance started",instanceid)
+    logger.log_it("instance started"+str(instanceid))
     #state=get_instance_state(instanceid)
     while(flag):
         videokey=SQS.get_video_key()
         if videokey is None:            # if the queue is empty, simply update the state in s3 and stop this instance
             break
-        logger.log_it("got video key ",videokey)
+        logger.log_it("got video key "+str(videokey))
         print(videokey)
         S3.getVideoFile(videokey)
-        logger.log_it("got video file for video key -",videokey)
-        logger.log_it("starting darknet now for video key - ",videokey)
+        logger.log_it("got video file for video key -"+str(videokey))
+        logger.log_it("starting darknet now for video key - "+str(videokey))
         do.start(videokey)
         #import pdb;pdb.set_trace()
         #EC2i.start_darknet(videokey)
         #S3.push_result_s3("newtestfile") # for this file name which is the output file specify the format
         print('darknet processing done')
-        logger.log_it("darknet processing done for video key - ",videokey)
+        logger.log_it("darknet processing done for video key - "+str(videokey))
         logger.log_it("checking if sqs has any new videokey")
 
         #S3.upload_output_file(videokey)
