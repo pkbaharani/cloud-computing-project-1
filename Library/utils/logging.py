@@ -9,7 +9,7 @@ class logging:
 
 
     def file_handler(self):
-        filename="ec2-logs"+str(int(time.time()))
+        filename="logs/ec2-logs"+str(int(time.time()))
         file=open(filename,'a+')
         self.file_handler=file
 
