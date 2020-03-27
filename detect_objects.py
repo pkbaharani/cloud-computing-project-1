@@ -1,5 +1,5 @@
 INPUT_VIDEOS = "./Input_Videos/{}"
-OUTPUT_FOLDER = "./Detected_Outputs/{}.txt"
+OUTPUT_FOLDER = "./Detected_Outputs/{}_pi.txt"
 import Library.s3 as S3
 import os
 import sys

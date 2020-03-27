@@ -3,6 +3,7 @@ import pi_utils
 import detect_objects
 from multiprocessing import Pool
 import Library.s3 as S3
+
 '''
 SETUP:
 
@@ -28,10 +29,10 @@ record_time = int(sys.argv[2])
 inf = False
 
 if duration == "inf":
-    inf = True
+    duration = 9223372036854775807
 else:
     duration = int(duration)
-    start_time = datetime.now()
+start_time = datetime.now()
     
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
@@ -73,10 +74,6 @@ while flag == 0:
                 #S3.uploadVideoFile(file_path)
                 video_thread = threading.Thread(target=S3.uploadVideoFile, args=(file_path,))
                 video_thread.start()
-                snapshot1 = tracemalloc.take_snapshot()
-                top_stats = snapshot1.compare_to(snapshot1, 'lineno')
-                for stat in top_stats[:20]:
-                    print(stat)
             else:
                 pi_utils.set_busy()
                 darknet_thread = threading.Thread(target=detect_objects.start, args=(file_path,True,))
