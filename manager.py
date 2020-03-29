@@ -13,8 +13,9 @@ def auto_scale():
     que_length=SQS.get_queue_length()
     print('queue length is ',que_length)
 
-    #CASE-1 -> shut all the instances if there is nothing in the queue
+    #CASE-1 -> shut all the instances if there is nothing in the queuei
     if que_length==0:
+        print('queue is empty, shutting all the instances')
         shut_all_instances()
         return
 
@@ -28,8 +29,8 @@ def auto_scale():
     if upcount == instanceCount: # 15 is the total number of instances available out of 20 resources
         if que_length<upcount:
             # CASE-2-> downscale
-            downscale(que_length,upcount)
-
+            #downscale(que_length,upcount)
+            pass
 
 def shut_all_instances():
     for instance in instanceIds:
@@ -44,7 +45,7 @@ def upscale(que_length,upcount):
         print(instanceIds)
         print('\n upscaling, adding ', diff,' instances and instnace id is ',instanceIds[i],'\n\n\n\n')
         temp=EC2i.get_instance_state(instanceIds[i])
-        print('value of temp is ',temp)
+        print('instance:',instanceIds[i],'  state- ',temp)
         if temp == 0:
             instance=instanceIds[i]
             EC2i.start_instnace(instance)                   # starting instance
@@ -64,17 +65,19 @@ def get_total_ec2_upcount():
     for instance in instanceIds:
         temp=EC2i.get_instance_state(instance)
         upcount=upcount+temp
+    print("total number of instances up ",upcount)
     return upcount
 
 
 def get_instance_ids():
     ec2 = boto3.resource('ec2')
     for instance in ec2.instances.all():
-        print (instance.id , instance.state)
+        print (instance.id)
+        #print(str(instance.state))
         myinstanceid=EC2i.get_my_instance_id()
-        if myinstanceid!=instance.id and instance.state !='terminated':
+        if myinstanceid!=instance.id and instance.state['Name']!='terminated':
             instanceIds.append(instance.id)
-
+            print(instance.state)
 
 if __name__=='__main__':
 
@@ -97,13 +100,9 @@ if __name__=='__main__':
 '''
 #******NOT REQUIRED at this time *************
 def start_next_available_instance():
-
     for instanceid in instanceIds:
         if instanceIds[instanceid]==0:
             EC2i.start_instnace(instanceid)
-
-
-
 if __name__=='__main__':
     i=0
     while True:

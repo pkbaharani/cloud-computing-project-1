@@ -10,8 +10,8 @@ def get_queue_length():
     queue = sqs.get_queue_by_name(QueueName='video-key')
     print("getting queue length")
     return int(queue.attributes.get('ApproximateNumberOfMessages'))
+    #que=queue.receive_messages(MessageAttributeNames=['Video-Key'])
 
-    que=queue.receive_messages(MessageAttributeNames=['Video-Key'])
 def pushSQS(video_key):
     client = boto3.resource('sqs', region_name="us-east-1")
     queue=client.get_queue_by_name(QueueName=SQS_NAME)
