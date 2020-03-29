@@ -3,6 +3,7 @@ import pi_utils
 import detect_objects
 from multiprocessing import Pool
 import Library.s3 as S3
+import psutil
 
 '''
 SETUP:
@@ -23,15 +24,15 @@ import gc
 import threading
 
 sensor = 12
-duration = sys.argv[1]
+video_count = sys.argv[1]
 record_time = int(sys.argv[2])
 
 inf = False
 
-if duration == "inf":
-    duration = 9223372036854775807
+if video_count == "inf":
+    video_count = 9223372036854775807
 else:
-    duration = int(duration)
+    video_count = int(video_count)
 start_time = datetime.now()
     
 GPIO.setwarnings(False)
@@ -41,8 +42,8 @@ GPIO.setup(sensor, GPIO.IN)
 on = 0
 off = 0
 flag = 0
-
-pi_utils.set_free()
+current_count = 0
+#pi_utils.set_free()
 
 tracemalloc.start()
 while flag == 0:
@@ -55,12 +56,15 @@ while flag == 0:
             print('')
             flag = 0
         print("No intruders")
+        if not pi_utils.is_busy:	
+                darknet_thread2 = threading.Thread(target=detect_objects.get_from_SQS_and_start)
+                darknet_thread2.start()
         time.sleep(1)
-        end_time = datetime.now()
-        if (end_time-start_time).seconds > duration:
+        if current_count > video_count:
             break
     elif i == 1:
         if flag == 0:
+            current_count += 1
             print("Intruder detected")
             on = time.time()
             flag = 1
@@ -75,8 +79,8 @@ while flag == 0:
                 video_thread = threading.Thread(target=S3.uploadVideoFile, args=(file_path,))
                 video_thread.start()
             else:
-                pi_utils.set_busy()
-                darknet_thread = threading.Thread(target=detect_objects.start, args=(file_path,True,))
+                #pi_utils.set_busy()
+                darknet_thread = threading.Thread(target=detect_objects.start, args=(file_path,))
                 darknet_thread.start()
                 #pool = Pool(processes=2)
                 #result = pool.apply_async(detect_objects.start, [file_path, True])
@@ -89,11 +93,10 @@ while flag == 0:
             if inf:
                 flag = 0
             else:
-                end_time = datetime.now()
-                if (end_time-start_time).seconds <= duration:
+                if current_count < video_count:
                     flag = 0
         time.sleep(0.1)
 
-while pi_utils.is_busy():
+while pi_utils.is_busy() or detect_objects.get_from_SQS_and_start() != None:
     continue
         
