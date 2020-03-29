@@ -13,8 +13,9 @@ def auto_scale():
     que_length=SQS.get_queue_length()
     print('queue length is ',que_length)
 
-    #CASE-1 -> shut all the instances if there is nothing in the queue
+    #CASE-1 -> shut all the instances if there is nothing in the queuei
     if que_length==0:
+        print('queue is empty, shutting all the instances')
         shut_all_instances()
         return
 
@@ -44,7 +45,7 @@ def upscale(que_length,upcount):
         print(instanceIds)
         print('\n upscaling, adding ', diff,' instances and instnace id is ',instanceIds[i],'\n\n\n\n')
         temp=EC2i.get_instance_state(instanceIds[i])
-        print('value of temp is ',temp)
+        print('instance:',instanceIds[i],'  state- ',temp)
         if temp == 0:
             instance=instanceIds[i]
             EC2i.start_instnace(instance)                   # starting instance
