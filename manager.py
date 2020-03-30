@@ -22,7 +22,7 @@ def auto_scale():
     upcount=get_total_ec2_upcount()     #get count of the number of instances that are up
 
     #Case-2 -> upscale
-    if upcount<instanceCount and upcount<que_length:
+    if upcount<instanceCount:
         upscale(que_length,upcount)
 
     #Case-3 -> check if downscale is required
@@ -38,7 +38,7 @@ def shut_all_instances():
 
 
 def upscale(que_length,upcount):
-    diff=min(que_length-upcount,instanceCount-upcount) # this is to reach maximum capacity or to empty the queue
+    diff=min(que_length,instanceCount-upcount) # this is to reach maximum capacity or to empty the queue
     for i in range(instanceCount):
         if(diff==0):
             break
