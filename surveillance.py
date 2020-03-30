@@ -3,6 +3,7 @@ import pi_utils
 import detect_objects
 from multiprocessing import Pool
 import Library.s3 as S3
+import Library.sqs as SQS
 import psutil
 
 '''

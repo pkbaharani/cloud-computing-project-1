@@ -6,7 +6,7 @@ SQS_NAME = 'video-key'
 
 
 def get_queue_length():
-    sqs = boto3.resource('sqs')
+    sqs = boto3.resource('sqs', region_name="us-east-1")
     queue = sqs.get_queue_by_name(QueueName='video-key')
     print("getting queue length")
     return int(queue.attributes.get('ApproximateNumberOfMessages'))
@@ -21,7 +21,7 @@ def pushSQS(video_key):
 
 #polling key from the sqs
 def get_video_key():
-    sqs = boto3.resource('sqs')
+    sqs = boto3.resource('sqs', region_name="us-east-1")
     queue = sqs.get_queue_by_name(QueueName='video-key')
     print("getting messages")
     que=queue.receive_messages(MessageAttributeNames=['Video-Key'])

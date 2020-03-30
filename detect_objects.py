@@ -1,6 +1,7 @@
 INPUT_VIDEOS = "./Input_Videos/{}"
 OUTPUT_FOLDER = "./Detected_Outputs/{}.txt"
 import Library.s3 as S3
+import Library.sqs as SQS
 import os
 import sys
 import subprocess
@@ -11,10 +12,9 @@ def get_from_SQS_and_start():
         videokey=SQS.get_video_key()
         if videokey is None:            # if the queue is empty, simply update the state in s3 and stop this instance
             return None
-        print(videokey)
-	
+        print(videokey)	
         start(videokey)
-	return videokey
+        return videokey
 
 def start(input_file_path):
 	#import pdb;pdb.set_trace()
