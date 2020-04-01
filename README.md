@@ -7,11 +7,11 @@
 
 * Prerequisites 
 - On AWS:
-    Access to AWS
-    EC2 worker AMI Id: ami-040ad2e7ebfff6476
+   - Access to AWS
+   - EC2 worker AMI Id: ami-040ad2e7ebfff6476
 - On Pi:
-    python3
-    python3 libraries on Pi: gc, boto3, psutil, tracemalloc, picamera
+   - python3
+   - python3 libraries on Pi: gc, boto3, psutil, tracemalloc, picamera
 
 * Execution instructions
 - On AWS:
