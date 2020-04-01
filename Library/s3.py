@@ -32,12 +32,13 @@ def upload_file(file_path, bucket_name, key):
 
 #client function
 #upload video to the s3, and push key on the sqs
-def uploadVideoFile(file_path):
+def uploadVideoFile(file_path, push_to_sqs=True):
     filename = file_path.split("/")[-1]
     s3_key = INPUT_S3_FOLDER.format(filename)
     upload_file(file_path, S3_BUCKET, s3_key)
     print("Uploaded {} to S3 bucket".format(filename))
-    SQS.pushSQS(s3_key)
+    if push_to_sqs: 
+    	SQS.pushSQS(s3_key)
     print("Pushed key to S3 bucket")
     return
 

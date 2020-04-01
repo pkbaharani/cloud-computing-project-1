@@ -25,19 +25,19 @@ def record_video(duration):
 	
 	
 def is_busy():
-	if (psutil.virtual_memory().available / 1048576.0) < 400.0:
-		return True
-	return False
-#	with open("./pi_status.txt", "r") as file_ptr:
-#		status = file_ptr.readline()
-#	if status == "0":
-#		return False
-#	return True
-#	
-#def set_busy():
-#	with open(STATUS_FILE, "w+") as file_ptr:
-#		file_ptr.write("1")
-#
-#def set_free():
-#	with open(STATUS_FILE, "w+") as file_ptr:
-#		file_ptr.write("0")
+	#if (psutil.virtual_memory().available / 1048576.0) < 400.0:
+	#	return True
+	#return False
+	with open("./pi_status.txt", "r") as file_ptr:
+		status = file_ptr.readline()
+	if status == "0":
+		return False
+	return True
+	
+def set_busy():
+	with open(STATUS_FILE, "w+") as file_ptr:
+		file_ptr.write("1")
+
+def set_free():
+	with open(STATUS_FILE, "w+") as file_ptr:
+		file_ptr.write("0")

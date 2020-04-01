@@ -44,7 +44,7 @@ on = 0
 off = 0
 flag = 0
 current_count = 0
-#pi_utils.set_free()
+pi_utils.set_free()
 
 tracemalloc.start()
 while flag == 0:
@@ -57,9 +57,12 @@ while flag == 0:
             print('')
             flag = 0
         print("No intruders")
-        if not pi_utils.is_busy:	
+        if not pi_utils.is_busy:
+               	print("pi is idle, now would join the rest of the workers")
+                pi_utils.set_busy()
                 darknet_thread2 = threading.Thread(target=detect_objects.get_from_SQS_and_start)
                 darknet_thread2.start()
+                print("helped the workers with one unit of work")    
         time.sleep(1)
         if current_count > video_count:
             break
@@ -73,15 +76,12 @@ while flag == 0:
             file_path = pi_utils.record_video(record_time)
             time.sleep(0.1)  
             gc.collect()
-            if pi_utils.is_busy():
-                #pool = Pool(processes=2)
-                #result2 = pool.apply_async(S3.uploadVideoFile, [file_path])
-                #S3.uploadVideoFile(file_path)
-                video_thread = threading.Thread(target=S3.uploadVideoFile, args=(file_path,))
+
+            if not pi_utils.is_busy():
+                video_thread = threading.Thread(target=S3.uploadVideoFile, args=(file_path,False))
                 video_thread.start()
-            else:
-                #pi_utils.set_busy()
-                darknet_thread = threading.Thread(target=detect_objects.start, args=(file_path,))
+                pi_utils.set_busy()
+                darknet_thread = threading.Thread(target=detect_objects.start, args=(file_path,True))
                 darknet_thread.start()
                 #pool = Pool(processes=2)
                 #result = pool.apply_async(detect_objects.start, [file_path, True])
@@ -91,6 +91,9 @@ while flag == 0:
                 #result.get()
                 #pool.close()
                 #pool.join()
+            else:
+                video_thread = threading.Thread(target=S3.uploadVideoFile, args=(file_path,True))
+                video_thread.start()
             if inf:
                 flag = 0
             else:
