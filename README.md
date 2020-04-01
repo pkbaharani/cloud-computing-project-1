@@ -1,9 +1,14 @@
 # Cloud Computing Project
 ## Team Members:
-### 1.Prateek Baharani
-### 2.Sanchit Pruthi
-### 3.Siddharth Kumar Nolastname
+### 1.Prateek Baharani - pbaharan@asu.edu
+### 2.Sanchit Pruthi - spruthi@asu.edu
+### 3.Siddharth Kumar Nolastname - skuma150@asu.edu
 
+
+* Setup Details
+   - S3 bucket name: cse-546-video-files
+      - Input videos path: Input_Videos/
+      - Detected output path: Detected_Outputs/
 
 * Prerequisites 
    - On AWS:
